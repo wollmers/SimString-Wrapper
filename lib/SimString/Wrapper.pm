@@ -4,7 +4,93 @@ use strict;
 use 5.008_005;
 our $VERSION = '0.01';
 
+#use FileHandle;
+#use IPC::Open2;
+
+sub new {
+  my $class = shift;
+  # uncoverable condition false
+  bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
+}
+
+sub simstring {
+  my $self = shift;
+  
+  my $query = shift;
+  my $database = shift;
+  my $threshold = shift;
+  
+#  my $pid = open2(*Reader, *Writer, "simstring -d ../sample/names.2");
+#  print Writer "$query\n";
+#  my $got = <Reader>;
+
+  open( my $reader, "echo $query | simstring -d $database -t $threshold -q|");
+  my @got = <$reader>;
+
+  return @got;
+
+}
+
+sub _options {
+  my $self = shift;
+  my $options = shift;
+  my $attributes = {
+    'b'     => sub { $_[0] ? ' --build' : '';},
+    'build' => sub { $_[0] ? ' --build' : '';},
+    'u'     => sub { $_[0] ? ' --unicode' : '';},
+    'unicode'     => sub { $_[0] ? ' --unicode' : '';},
+    'm'     => sub { $_[0] ? ' --mark' : '';},
+    'mark'     => sub { $_[0] ? ' --mark' : '';},
+    'n'     => sub { ($_[0] && $_[0] =~ m/^[1-9][0-9]*$/x ) ? ' --ngram='.$_[0] : '';},
+    'ngram'     => sub { ($_[0] && $_[0] =~ m/^[1-9][0-9]*$/x ) ? ' --ngram='.$_[0] : '';},
+    's'     => sub {  
+       ($_[0] && $_[0] =~ /^(exact|dice|cosine|jaccard|overlap)$/) 
+         ? ' --similarity='.$_[0] : '';
+    },
+    'similarity'     => sub { 
+       ($_[0] && $_[0] =~ /^(exact|dice|cosine|jaccard|overlap)$/) 
+         ? ' --similarity='.$_[0] : '';
+    },
+    't'     => sub { 
+      ($_[0] && $_[0] =~ m/^(?:0\.[0-9]+|1)$/x ) ? ' --threshold='.$_[0] : '';
+    },
+    
+    
+  };
+  $self->{options} = '';
+  for my $option (sort keys %$options) {
+    if (exists $attributes->{$option} && $options->{$option}) {
+      $self->{options} .= $attributes->{$option}->($options->{$option});
+    }
+  }
+  return $self->{options};
+}
+
+=pod
+
+  -b, --build           build a database for strings read from STDIN
+  -d, --database=DB     specify a database file
+  -u, --unicode         use Unicode (wchar_t) for representing characters
+  -n, --ngram=N         specify the unit of n-grams (DEFAULT=3)
+  -m, --mark            include marks for begins and ends of strings
+  -s, --similarity=SIM  specify a similarity measure (DEFAULT='cosine'):
+      exact                 exact match
+      dice                  dice coefficient
+      cosine                cosine coefficient
+      jaccard               jaccard coefficient
+      overlap               overlap coefficient
+  -t, --threshold=TH    specify the threshold (DEFAULT=0.7)
+  -e, --echo-back       echo back query strings to the output
+  -q, --quiet           suppress supplemental information from the output
+  -p, --benchmark       show benchmark result (retrieved strings are suppressed)
+  -v, --version         show this version information and exit
+  -h, --help            show this help message and exit
+
+
+=cut
+
 1;
+
 __END__
 
 =encoding utf-8
@@ -19,7 +105,7 @@ SimString::Wrapper - Blah blah blah
 
 =head1 DESCRIPTION
 
-SimString::Wrapper is
+SimString::Wrapper is wraps an object over the command line interface of SimString.
 
 =head1 AUTHOR
 

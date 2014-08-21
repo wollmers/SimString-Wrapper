@@ -28,3 +28,4 @@ pm_to_blib
 MYMETA.*
 !META.json
 /.prove
+/sample
