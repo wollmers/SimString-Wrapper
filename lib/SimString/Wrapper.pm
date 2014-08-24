@@ -1,6 +1,7 @@
 package SimString::Wrapper;
 
 use strict;
+use warnings;
 use 5.008_005;
 our $VERSION = '0.01';
 
@@ -97,7 +98,7 @@ __END__
 
 =head1 NAME
 
-SimString::Wrapper - Blah blah blah
+SimString::Wrapper - Interface to SimString
 
 =head1 SYNOPSIS
 

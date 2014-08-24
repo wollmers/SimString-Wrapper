@@ -18,7 +18,7 @@
 
 # NAME
 
-SimString::Wrapper - Blah blah blah
+SimString::Wrapper - Interface to SimString
 
 # SYNOPSIS
 
