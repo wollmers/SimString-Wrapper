@@ -16,20 +16,19 @@ sub new {
 
 sub simstring {
   my $self = shift;
-  
+
   my $query = shift;
   my $database = shift;
   my $threshold = shift;
-  
+
 #  my $pid = open2(*Reader, *Writer, "simstring -d ../sample/names.2");
 #  print Writer "$query\n";
 #  my $got = <Reader>;
 
   open( my $reader, "echo $query | simstring -d $database -t $threshold -q|");
   my @got = <$reader>;
-
+  return map { chomp($_);$_ =~ s/^\s+//;$_ } @got;
   return @got;
-
 }
 
 sub _options {
@@ -38,25 +37,39 @@ sub _options {
   my $attributes = {
     'b'     => sub { $_[0] ? ' --build' : '';},
     'build' => sub { $_[0] ? ' --build' : '';},
+    'd'     => sub { $_[0] ? ' --database' : '';},
+    'database' => sub { $_[0] ? ' --database' : '';},
     'u'     => sub { $_[0] ? ' --unicode' : '';},
     'unicode'     => sub { $_[0] ? ' --unicode' : '';},
     'm'     => sub { $_[0] ? ' --mark' : '';},
     'mark'     => sub { $_[0] ? ' --mark' : '';},
     'n'     => sub { ($_[0] && $_[0] =~ m/^[1-9][0-9]*$/x ) ? ' --ngram='.$_[0] : '';},
     'ngram'     => sub { ($_[0] && $_[0] =~ m/^[1-9][0-9]*$/x ) ? ' --ngram='.$_[0] : '';},
-    's'     => sub {  
-       ($_[0] && $_[0] =~ /^(exact|dice|cosine|jaccard|overlap)$/) 
+    's'     => sub {
+       ($_[0] && $_[0] =~ /^(exact|dice|cosine|jaccard|overlap)$/)
          ? ' --similarity='.$_[0] : '';
     },
-    'similarity'     => sub { 
-       ($_[0] && $_[0] =~ /^(exact|dice|cosine|jaccard|overlap)$/) 
+    'similarity'     => sub {
+       ($_[0] && $_[0] =~ /^(exact|dice|cosine|jaccard|overlap)$/)
          ? ' --similarity='.$_[0] : '';
     },
-    't'     => sub { 
+    't'     => sub {
       ($_[0] && $_[0] =~ m/^(?:0\.[0-9]+|1)$/x ) ? ' --threshold='.$_[0] : '';
     },
-    
-    
+    'threshold'     => sub {
+      ($_[0] && $_[0] =~ m/^(?:0\.[0-9]+|1)$/x ) ? ' --threshold='.$_[0] : '';
+    },
+    'e'     => sub { $_[0] ? ' --echo-back' : '';},
+    'echo-back'     => sub { $_[0] ? ' --echo-back' : '';},
+    'q'     => sub { $_[0] ? ' --quiet' : '';},
+    'quiet'     => sub { $_[0] ? ' --quiet' : '';},
+    'p'     => sub { $_[0] ? ' --benchmark' : '';},
+    'benchmark'     => sub { $_[0] ? ' --benchmark' : '';},
+    'v'     => sub { $_[0] ? ' --version' : '';},
+    'version'     => sub { $_[0] ? ' --version' : '';},
+    'h'     => sub { $_[0] ? ' --help' : '';},
+    'help'     => sub { $_[0] ? ' --help' : '';},
+
   };
   $self->{options} = '';
   for my $option (sort keys %$options) {
@@ -106,7 +119,7 @@ SimString::Wrapper - Interface to SimString
 
 =head1 DESCRIPTION
 
-SimString::Wrapper is wraps an object over the command line interface of SimString.
+SimString::Wrapper wraps an object over the command line interface of SimString.
 
 =head1 AUTHOR
 
