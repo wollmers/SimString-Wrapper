@@ -26,7 +26,7 @@ SimString::Wrapper - Interface to SimString
 
 # DESCRIPTION
 
-SimString::Wrapper is wraps an object over the command line interface of SimString.
+SimString::Wrapper wraps an object over the command line interface of SimString.
 
 # AUTHOR
 
